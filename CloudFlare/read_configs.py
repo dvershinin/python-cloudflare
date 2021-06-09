@@ -37,7 +37,7 @@ def read_configs(profile=None):
         # we have a configuration file - lets use it
         try:
             # grab the section - as we will use it for all values
-            section = cp[profile]
+            section = dict(cp.items(profile))
         except Exception as e:
             # however section name is missing - this is an error
             raise Exception("%s: configuration section missing" % (profile))
@@ -46,9 +46,9 @@ def read_configs(profile=None):
             if option not in config or config[option] is None:
                 try:
                     if option == 'extras':
-                        config[option] = re.sub(r"\s+", ' ', section.get(option))
+                        config[option] = re.sub(r"\s+", ' ', cp.get(profile, option))
                     else:
-                        config[option] = re.sub(r"\s+", '', section.get(option))
+                        config[option] = re.sub(r"\s+", '', cp.get(profile, option))
                     if config[option] == '':
                         config.pop(option)
                 except (configparser.NoOptionError, configparser.NoSectionError):
@@ -59,7 +59,7 @@ def read_configs(profile=None):
             for method in ['get', 'patch', 'post', 'put', 'delete']:
                 option_for_method = option + '.' + method
                 try:
-                    config[option_for_method] = re.sub(r"\s+", '', section.get(option_for_method))
+                    config[option_for_method] = re.sub(r"\s+", '', cp.get(profile, option_for_method))
                     if config[option_for_method] == '':
                         config.pop(option_for_method)
                 except (configparser.NoOptionError, configparser.NoSectionError) as e:
